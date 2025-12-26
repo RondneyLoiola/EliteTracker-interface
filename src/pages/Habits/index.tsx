@@ -1,5 +1,5 @@
 import { PaperPlaneRightIcon, TrashIcon } from "@phosphor-icons/react"
-import SideBar from "../../Components/siderbar"
+import SideBar from "../../Components/Siderbar"
 import styles from './styles.module.css'
 
 function Habits() {
