@@ -10,7 +10,7 @@ export type UserData = {
 };
 
 type UserContextProps = {
-	getUserInfo: (githubCode: string) => void;
+	getUserInfo: (githubCode: string) => Promise<void>; //função assíncrona
 	userData: UserData;
 }
 
