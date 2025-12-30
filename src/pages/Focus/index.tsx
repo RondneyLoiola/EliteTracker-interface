@@ -1,9 +1,13 @@
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: useEffect */
+import { Indicator } from '@mantine/core';
+import { Calendar } from '@mantine/dates';
 import { PlusIcon } from '@phosphor-icons/react';
 import dayjs from 'dayjs';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTimer } from 'react-timer-hook';
 import Button from '../../Components/Button';
 import Header from '../../Components/Header';
+import Info from '../../Components/Info';
 import api from '../../services/api';
 import styles from './styles.module.css';
 
@@ -11,6 +15,20 @@ type Timers = {
 	focus: number;
 	rest: number;
 };
+
+type FocusMetrics = {
+	_id: [number, number, number]; // tres posicoes, dia, mes e ano
+	count: number;
+}
+
+type FocusTime = {
+	_id: string;
+	timeFrom: string;
+	timeTo: string;
+	userId: string;
+	createdAt: string;
+	updatedAt: string;
+}
 
 enum TimerState {
 	PAUSED = 'PAUSED',
@@ -30,6 +48,9 @@ function Focus() {
 	const [timers, setTimers] = useState<Timers>({ focus: 0, rest: 0 });
 	const [timerState, setTimerState] = useState(TimerState.PAUSED);
 	const [timeFrom, setTimeFrom] = useState<Date | null>(null);
+	const [focusMetrics, setFocusMetrics] = useState<FocusMetrics>({} as FocusMetrics);
+
+	const [currentMonth, setCurrentMonth] = useState<dayjs.Dayjs>(dayjs().startOf('month'));
 
 	function addSeconds(date: Date, seconds: number) {
 		const time = dayjs(date).add(seconds, 'seconds');
@@ -144,6 +165,28 @@ function Focus() {
 		setTimerState(TimerState.FOCUS); // define o estado como foco
 	}
 
+	async function loadFocusMetrics(currentMonth: string){
+		const { data } = await api.get<FocusMetrics[]>('/focus-time/metrics', {
+			params: {
+				date: currentMonth
+			}
+		})
+
+		const [metrics] = data //pega o primeiro item
+
+		setFocusMetrics(metrics || ({} as FocusMetrics))
+	}
+
+	async function handleSelectMonth(date: Date | string){
+		const dateObject = typeof date === 'string' ? new Date(date) : date;
+
+		setCurrentMonth(dayjs(dateObject))
+	}
+
+	useEffect(() => {
+		loadFocusMetrics(currentMonth.toISOString())
+	}, [currentMonth])
+
 	return (
 		<div className={styles.container}>
 			<div className={styles.content}>
@@ -203,6 +246,39 @@ function Focus() {
 					<Button onClick={handleCancel} variant="error">
 						Cancelar
 					</Button>
+				</div>
+			</div>
+			<div className={styles.metrics}>
+				<h2>Estatísticas</h2>
+
+				<div className={styles.infoContainer}>
+					<Info value={String(focusMetrics.count || 0)} label="Ciclos Totais" />
+					<Info value="120 minutos" label="Tempo total de Foco" />
+				</div>
+
+				<div className={styles.calendarContainer}>
+					<Calendar
+						onMonthSelect={handleSelectMonth}
+						onNextMonth={handleSelectMonth}
+						onPreviousMonth={handleSelectMonth}
+						renderDay={(date) => {
+							const day = dayjs(date).date();
+							// const isSameDate = metrics?.completedDates?.some(
+							// 	(item) => dayjs(item).isSame(dayjs(date)),
+							// 	// verifica se tem alguma data de completedDates que seja igual ao dia do calendário
+							// );
+							return (
+								<Indicator
+									size={10}
+									color="var(--info"
+									offset={-2}
+									//disabled={!isSameDate}
+								>
+									<div>{day}</div>
+								</Indicator>
+							);
+						}}
+					/>
 				</div>
 			</div>
 		</div>
