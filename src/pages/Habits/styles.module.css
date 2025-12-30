@@ -59,11 +59,26 @@
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid var(--light);
+    transition: background-color 0.1s;
+}
+
+.content .habits .habit:hover {
+    background-color: var(--info-hover);
+}
+
+.content .habits .habit-active {
+    background-color: var(--info-hover);
 }
 
 .content .habits .habit p {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    width: 100%;
     color: var(--white);
     font-size: 16px;
+    cursor: pointer;
+
 }
 
 .content .habits .habit div {

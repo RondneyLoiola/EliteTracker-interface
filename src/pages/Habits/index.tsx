@@ -1,4 +1,5 @@
 /** biome-ignore-all lint/correctness/useExhaustiveDependencies: useEffect */
+/** biome-ignore-all lint/a11y/useKeyWithClickEvents: onClick in 'p' */
 
 import { Calendar } from '@mantine/dates';
 import { PaperPlaneRightIcon, TrashIcon } from '@phosphor-icons/react';
@@ -8,6 +9,7 @@ import Header from '../../Components/Header';
 import Info from '../../Components/Info';
 import api from '../../services/api';
 import styles from './styles.module.css';
+import clsx from 'clsx';
 
 type Habit = {
 	_id: string;
@@ -18,10 +20,23 @@ type Habit = {
 	updatedAt: string;
 };
 
+type HabitMetrics = {
+	_id: string;
+	name: string;
+	completedDates: string[]; // string pq o json só entende string, quando vem da api
+}
+
 function Habits() {
 	const [habits, setHabits] = useState<Habit[]>([]);
+	const [metrics, setMetrics] = useState<HabitMetrics>({} as HabitMetrics);
+	const [selectedHabit, setSelectedHabit] = useState<Habit | null>(null); //null pq não tem nenhum habito selecionado
 	const nameInput = useRef<HTMLInputElement>(null);
 	const today = dayjs().startOf('day').toISOString(); //pega o dia de hoje
+
+	async function handleSelectedHabit(habit: Habit){
+		setSelectedHabit(habit);
+		console.log(habit);
+	}
 
 	async function loadHabits() {
 		const { data } = await api.get<Habit[]>('/habits');
@@ -75,8 +90,8 @@ function Habits() {
 				</div>
 				<div className={styles.habits}>
 					{habits.map((item) => (
-						<div key={item._id} className={styles.habit}>
-							<p>{item.name}</p>
+						<div key={item._id} className={clsx(styles.habit, item._id === selectedHabit?._id && styles['habit-active'])}>
+							<p onClick={async () => await handleSelectedHabit(item)}>{item.name}</p>
 							<div>
 								<input
 									type="checkbox"
