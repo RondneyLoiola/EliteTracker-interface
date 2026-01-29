@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router';
-import AppContainer from '../Components/App-container';
-import SideBar from '../Components/Siderbar';
+import AppContainer from '../components/AppContainer';
+import SideBar from '../components/Sidebar';
 import { userLocalStorageKey } from '../hooks/useUser';
 
 type PrivateRoutePropes = {

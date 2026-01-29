@@ -8,8 +8,8 @@ import { PaperPlaneRightIcon, TrashIcon } from '@phosphor-icons/react';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import Header from '../../Components/Header';
-import Info from '../../Components/Info';
+import Header from '../../components/Header';
+import Info from '../../components/Info';
 import api from '../../services/api';
 import styles from './styles.module.css';
 
